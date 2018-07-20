@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  sonarqube:
+    image: sonarqube
+    ports:
+      - "9000:9000"
+      - "9002:9002"
+    networks:
+      - sonarnet
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:mysql://database:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance
+      - SONARQUBE_JDBC_USERNAME=sonar
+      - SONARQUBE_JDBC_PASSWORD=0d389021a21703fbe6f48d762a84b722309afed8
+    depends_on:
+      - database
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: sonarqube 
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: sonarqube 
+
+  database:
+    image: mysql:latest 
+    ports:
+      - 3306:3306
+    networks:
+      - sonarnet
+    environment:
+      - MYSQL_DATABASE=sonar
+      - MYSQL_USER=sonar
+      - MYSQL_PASSWORD=0d389021a21703fbe6f48d762a84b722309afed8
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: sonardb 
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: sonardb
+
+networks:
+  sonarnet:
+    driver: bridge

@@ -1,0 +1,39 @@
+FROM centos:7
+
+RUN yum update -y && yum install -y sudo zip unzip java-1.8.0-openjdk java-1.8.0-openjdk-devel && \
+echo "export JAVA_HOME=/usr/lib/jvm/java" >> ~/.bashrc && source ~/.bashrc && \
+curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && yum -y install nodejs && \
+curl -L -O https://s3.amazonaws.com/aws-cli/awscli-bundle.zip && \
+curl -L -O http://apache.forsale.plus/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.zip && \
+curl -L -O https://services.gradle.org/distributions/gradle-4.4-bin.zip && \
+curl -L -O https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip && \
+npm install -g cordova && \
+unzip -q -d /tmp/ awscli-bundle.zip && \
+/tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
+unzip -q -d /opt apache-maven-3.5.2-bin.zip && \
+unzip -q -d /opt/gradle gradle-4.4-bin.zip && export PATH=$PATH:/opt/gradle/gradle-4.4/bin && \
+mkdir -p ~/.android && touch ~/.android/repositories.cfg && \
+unzip -q -d /opt/android sdk-tools-linux-3859397.zip && \
+cd /opt/android && yes | /opt/android/tools/bin/sdkmanager --licenses && \
+/opt/android/tools/bin/sdkmanager --update && \
+/opt/android/tools/bin/sdkmanager "build-tools;27.0.2" && \
+echo "export ANDROID_HOME=/opt/android" >> ~/.bashrc && \
+echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools:/opt/gradle/gradle-4.4/bin:/opt/apache-maven-3.5.2/bin" >> ~/.bashrc && \
+yum clean all
+
+# Set environment variables.
+ENV HOME /root
+
+ENV ANDROID_HOME=/opt/android
+
+ENV JAVA_HOME=/usr/lib/jvm/java
+
+ENV GRADLE_HOME=/opt/gradle/gradle-4.4
+
+ENV PATH="/opt/gradle/gradle-4.4/bin:${PATH}"
+
+# Define working directory.
+WORKDIR /root
+
+# Define default command.
+CMD ["bash"]

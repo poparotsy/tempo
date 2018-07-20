@@ -1,0 +1,37 @@
+FROM centos:7
+
+RUN yum update -y && \
+yum install -y epel-release wget sudo zip unzip java-1.8.0-openjdk java-1.8.0-openjdk-devel && \
+yum install -y python-pip python-wheel python-setuptools && \
+curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash - && yum -y install nodejs && \
+npm install -g cordova && \
+pip install --upgrade awscli && \
+export JAVA_HOME=/usr/lib/jvm/java && \ 
+echo "export JAVA_HOME=/usr/lib/jvm/java" >> ~/.bashrc && \
+mkdir /opt/gradle && wget -q https://services.gradle.org/distributions/gradle-4.4-bin.zip && \
+unzip -q -d /opt/gradle gradle-4.4-bin.zip && export PATH=$PATH:/opt/gradle/gradle-4.4/bin && \
+mkdir /opt/android && mkdir -p ~/.android && touch ~/.android/repositories.cfg && wget -q https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip && \
+unzip -q -d /opt/android sdk-tools-linux-3859397.zip && \
+cd /opt/android && yes | /opt/android/tools/bin/sdkmanager --licenses && \
+/opt/android/tools/bin/sdkmanager --update && \
+/opt/android/tools/bin/sdkmanager "build-tools;27.0.2" && \ 
+echo "export ANDROID_HOME=/opt/android" >> ~/.bashrc && \
+echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools:/opt/gradle/gradle-4.4/bin" >> ~/.bashrc && \ 
+yum clean all
+
+# Set environment variables.
+ENV HOME /root
+
+ENV ANDROID_HOME=/opt/android
+
+ENV JAVA_HOME=/usr/lib/jvm/java
+
+ENV GRADLE_HOME=/opt/gradle/gradle-4.4
+
+ENV PATH="/opt/gradle/gradle-4.4/bin:${PATH}"
+
+# Define working directory.
+WORKDIR /root
+
+# Define default command.
+CMD ["bash"]
